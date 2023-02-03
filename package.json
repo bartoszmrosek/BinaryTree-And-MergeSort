@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "This is typescript implementation of binary tree, it`s search and merge-sort algorithm. Runs in node eviroment and uses jest for testing.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
