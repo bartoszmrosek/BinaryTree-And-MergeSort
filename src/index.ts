@@ -1,21 +1,26 @@
-import BinaryTree, { TraverseType } from './BinaryTree/BinaryTree.js';
+import BinaryTree from './BinaryTree/BinaryTree.js';
+import BinarySearchTree from './BinaryTree/BinarySearchTree.js';
 
 const root = new BinaryTree<string>({ value: 'a' });
 root.setTree({
   value: 'a',
-  left: new BinaryTree({
+  left: {
     value: 'ab',
-    left: new BinaryTree({ value: 'aba' }).getTree(),
-    right: new BinaryTree({ value: 'abb' }).getTree(),
-  }).getTree(),
-  right: new BinaryTree({
+    left: { value: 'aba' },
+    right: { value: 'abb' },
+  },
+  right: {
     value: 'ac',
-    right: new BinaryTree({
+    right: {
       value: 'aca',
-      right: new BinaryTree({ value: 'acaa' }).getTree(),
-    }).getTree(),
-  }).getTree(),
+      right: { value: 'acaa' },
+    },
+  },
 });
 
-console.log(root.getTree());
-console.log(root.traverse(TraverseType.breadth_first));
+const SearchTree = new BinarySearchTree({
+  value: 0,
+  left: { value: 1 },
+});
+
+console.log(SearchTree.has(0));

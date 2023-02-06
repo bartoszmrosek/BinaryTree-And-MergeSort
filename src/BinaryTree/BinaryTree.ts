@@ -1,4 +1,4 @@
-interface TreeNode<T> {
+export interface TreeNode<T> {
   value: T;
   left?: TreeNode<T>;
   right?: TreeNode<T>;
@@ -12,7 +12,7 @@ export enum TraverseType {
 }
 
 class BinaryTree<ValueType> {
-  private tree: TreeNode<ValueType>;
+  protected tree: TreeNode<ValueType>;
   constructor(tree: TreeNode<ValueType>) {
     this.tree = tree;
   }
@@ -26,72 +26,121 @@ class BinaryTree<ValueType> {
     return this.tree;
   }
 
-  traverse(traverseType: TraverseType): ValueType[] {
-    function inorderTraverse(
-      tree: TreeNode<ValueType>,
-      valueArrayRef: ValueType[],
-    ) {
+  private inorderTraverse(
+    tree: TreeNode<ValueType>,
+    valueArrayRef: ValueType[],
+  ) {
+    if (tree.left) {
+      this.inorderTraverse(tree.left, valueArrayRef);
+    }
+    valueArrayRef.push(tree.value);
+    if (tree.right) {
+      this.inorderTraverse(tree.right, valueArrayRef);
+    }
+  }
+
+  private preorderTraverse(
+    tree: TreeNode<ValueType>,
+    valueArrayRef: ValueType[],
+  ) {
+    valueArrayRef.push(tree.value);
+    if (tree.left) {
+      this.preorderTraverse(tree.left, valueArrayRef);
+    }
+    if (tree.right) {
+      this.preorderTraverse(tree.right, valueArrayRef);
+    }
+  }
+
+  private postorderTraverse(
+    tree: TreeNode<ValueType>,
+    valueArrayRef: ValueType[],
+  ) {
+    if (tree.left) {
+      this.postorderTraverse(tree.left, valueArrayRef);
+    }
+    if (tree.right) {
+      this.postorderTraverse(tree.right, valueArrayRef);
+    }
+    valueArrayRef.push(tree.value);
+  }
+
+  private calculateTreeHeight(tree: TreeNode<ValueType> | undefined) {
+    if (tree === undefined) return 0;
+    const rightSubTree: number = this.calculateTreeHeight(tree.right);
+    const leftSubTree: number = this.calculateTreeHeight(tree.left);
+
+    if (leftSubTree > rightSubTree) {
+      return leftSubTree + 1;
+    } else {
+      return rightSubTree + 1;
+    }
+  }
+
+  private addGivenLevel(
+    tree: TreeNode<ValueType>,
+    level: number,
+    arrayReference: ValueType[],
+  ): void {
+    if (level === 1) arrayReference.push(tree.value);
+
+    if (level > 1) {
       if (tree.left) {
-        inorderTraverse(tree.left, valueArrayRef);
+        this.addGivenLevel(tree.left, level - 1, arrayReference);
       }
-      valueArrayRef.push(tree.value);
+
       if (tree.right) {
-        inorderTraverse(tree.right, valueArrayRef);
+        this.addGivenLevel(tree.right, level - 1, arrayReference);
       }
     }
+  }
 
-    function preorderTraverse(
-      tree: TreeNode<ValueType>,
-      valueArrayRef: ValueType[],
-    ) {
-      valueArrayRef.push(tree.value);
-      if (tree.left) {
-        preorderTraverse(tree.left, valueArrayRef);
-      }
-      if (tree.right) {
-        preorderTraverse(tree.right, valueArrayRef);
-      }
-    }
+  private searchForColumnValues(
+    tree: TreeNode<ValueType>,
+    currentColumn: number,
+    searchedColumn: number,
+    valueArrayRef: ValueType[],
+  ) {
+    if (currentColumn === searchedColumn) valueArrayRef.push(tree.value);
+    if (tree.left)
+      this.searchForColumnValues(
+        tree.left,
+        currentColumn - 1,
+        searchedColumn,
+        valueArrayRef,
+      );
+    if (tree.right)
+      this.searchForColumnValues(
+        tree.right,
+        currentColumn + 1,
+        searchedColumn,
+        valueArrayRef,
+      );
+  }
 
-    function postorderTraverse(
-      tree: TreeNode<ValueType>,
-      valueArrayRef: ValueType[],
-    ) {
-      if (tree.left) {
-        postorderTraverse(tree.left, valueArrayRef);
-      }
-      if (tree.right) {
-        postorderTraverse(tree.right, valueArrayRef);
-      }
-      valueArrayRef.push(tree.value);
-    }
+  public getColumn(columnOrder: number): ValueType[] {
+    const valuesArray: ValueType[] = [];
+    this.searchForColumnValues(this.tree, 0, columnOrder, valuesArray);
+    return valuesArray;
+  }
 
-    function calculateTreeHeight(tree: TreeNode<ValueType> | undefined) {
-      if (tree === undefined) return 0;
-      const rightSubTree: number = calculateTreeHeight(tree.right);
-      const leftSubTree: number = calculateTreeHeight(tree.left);
-
-      if (leftSubTree > rightSubTree) {
-        return leftSubTree + 1;
-      } else {
-        return rightSubTree + 1;
-      }
-    }
-
+  public traverse(traverseType: TraverseType): ValueType[] {
     const valueArr: ValueType[] = [];
     switch (traverseType) {
       case TraverseType.inorder_DFS:
-        inorderTraverse(this.tree, valueArr);
+        this.inorderTraverse(this.tree, valueArr);
         return valueArr;
       case TraverseType.preorder_DFS:
-        preorderTraverse(this.tree, valueArr);
+        this.preorderTraverse(this.tree, valueArr);
         return valueArr;
       case TraverseType.postorder_DFS:
-        postorderTraverse(this.tree, valueArr);
+        this.postorderTraverse(this.tree, valueArr);
         return valueArr;
       case TraverseType.breadth_first:
-        // TBD
-        return [];
+        for (let i = 1; i <= this.calculateTreeHeight(this.tree); i++) {
+          this.addGivenLevel(this.tree, i, valueArr);
+        }
+        return valueArr;
     }
   }
 }
