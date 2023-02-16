@@ -22,5 +22,3 @@ const SearchTree = new BinarySearchTree({
   value: 0,
   left: { value: 1 },
 });
-
-console.log(SearchTree.has(0));
