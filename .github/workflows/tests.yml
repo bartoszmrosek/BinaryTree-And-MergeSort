@@ -1,0 +1,14 @@
+name: Tests CI
+
+on: push
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Run Jest tests
+        run: npm run test
